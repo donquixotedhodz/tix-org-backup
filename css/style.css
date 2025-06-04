@@ -322,4 +322,75 @@ body {
 .btn-login {
     padding: 0.6rem;
     font-size: 0.9rem;
+}
+
+/* Password toggle icon styles */
+.password-field-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 10;
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+}
+
+.password-toggle:hover {
+    color: #495057;
+}
+
+.password-toggle:focus {
+    outline: none;
+}
+
+/* Adjust form-floating padding for password fields */
+.form-floating .password-field-container .form-control {
+    padding-right: 32px;
+}
+
+/* Adjust password field container for form-floating */
+.form-floating .password-field-container {
+    width: 100%;
+}
+
+.form-floating .password-field-container .form-control {
+    height: calc(3.5rem + 2px);
+    line-height: 1.25;
+}
+
+.form-floating .password-field-container .password-toggle {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Ensure the input field takes full width */
+.password-field-container input {
+    width: 100%;
+    padding-right: 32px;
+}
+
+/* Adjust form-floating label position */
+.form-floating > .password-field-container > .form-control:focus ~ label,
+.form-floating > .password-field-container > .form-control:not(:placeholder-shown) ~ label {
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+/* Adjust icon size for form-floating */
+.form-floating .password-toggle i {
+    font-size: 14px;
 } 

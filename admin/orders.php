@@ -228,7 +228,7 @@ try {
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Order #</th>
+                                        <th>Ticket Number</th>
                                         <th>Customer</th>
                                         <th>Service Type</th>
                                         <th>Model</th>

@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         :root {
             --primary-blue: #1a237e;
-            --light-blue: #e8eaf6;
+            --light-blue:#f8f9fa;
             --hover-blue: #283593;
         }
         
@@ -193,6 +193,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 8px;
             margin-bottom: 1rem;
         }
+
+        .password-field-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            z-index: 10;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #495057;
+        }
+
+        .password-toggle:focus {
+            outline: none;
+        }
+
+        .password-field-container input {
+            padding-right: 35px;
+        }
+
+        .password-toggle i {
+            font-size: 14px;
+        }
+
+        /* Fix form-floating label position */
+        .form-floating > .password-field-container > .form-control:focus ~ label,
+        .form-floating > .password-field-container > .form-control:not(:placeholder-shown) ~ label {
+            transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+            background-color: white;
+            padding: 0 0.25rem;
+            height: auto;
+        }
+
+        /* Ensure proper spacing for the floating label */
+        .form-floating > .password-field-container {
+            position: relative;
+        }
+
+        /* Fix input height and alignment */
+        .form-floating > .password-field-container > .form-control {
+            height: calc(3.5rem + 2px);
+            line-height: 1.25;
+        }
+
+        /* Ensure the toggle button doesn't overlap with the label */
+        .form-floating > .password-field-container > .form-control:focus ~ label ~ .password-toggle,
+        .form-floating > .password-field-container > .form-control:not(:placeholder-shown) ~ label ~ .password-toggle {
+            top: 50%;
+        }
     </style>
 </head>
 <body>
@@ -235,13 +301,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
-                    <label for="username">Username</label>
+                    <div class="password-field-container">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    </div>
                 </div>
 
                 <div class="form-floating">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                    <label for="password">Password</label>
+                    <div class="password-field-container">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                       
+                        <button type="button" class="password-toggle" style="display: none;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 btn-login">
@@ -257,16 +329,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.addEventListener('DOMContentLoaded', function() {
             const roleCards = document.querySelectorAll('.role-card');
             const selectedRoleInput = document.getElementById('selectedRole');
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.password-toggle');
 
+            // Role selection functionality
             roleCards.forEach(card => {
                 card.addEventListener('click', function() {
-                    // Remove selected class from all cards
                     roleCards.forEach(c => c.classList.remove('selected'));
-                    // Add selected class to clicked card
                     this.classList.add('selected');
-                    // Update hidden input value
                     selectedRoleInput.value = this.dataset.role;
                 });
+            });
+
+            // Password toggle functionality
+            passwordInput.addEventListener('input', function() {
+                toggleButton.style.display = this.value.length > 0 ? 'flex' : 'none';
+            });
+
+            toggleButton.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent form submission
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
             });
         });
     </script>

@@ -24,6 +24,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../css/style.css">
+    <!-- Custom JS -->
+    <script src="../../js/password-toggle.js"></script>
     <style>
         /* Add any specific styles for the selection page here */
         .selection-card {
