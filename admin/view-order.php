@@ -18,6 +18,11 @@ try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Get admin details
+    $stmt = $pdo->prepare("SELECT name, profile_picture FROM admins WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
     // Get order details
     $stmt = $pdo->prepare("
         SELECT 
@@ -126,11 +131,16 @@ try {
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['username']) ?>&background=1a237e&color=fff" alt="User" class="rounded-circle me-2" width="32" height="32">
-                                <span class="me-3">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+                                <img src="<?= !empty($admin['profile_picture']) ? '../' . htmlspecialchars($admin['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($admin['name'] ?? $_SESSION['username']) . '&background=1a237e&color=fff' ?>" 
+                                     alt="Admin" 
+                                     class="rounded-circle me-2" 
+                                     width="32" 
+                                     height="32"
+                                     style="object-fit: cover;">
+                                <span class="me-3">Welcome, <?= htmlspecialchars($admin['name'] ?? $_SESSION['username']) ?></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="view/profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             </ul>

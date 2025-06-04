@@ -124,13 +124,28 @@ try {
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="https://ui-avatars.com/api/?name=<?= urlencode($_SESSION['username']) ?>&background=1a237e&color=fff" alt="Technician" class="rounded-circle me-2" width="32" height="32">
-                                <span class="me-3">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+                                <img src="<?= !empty($technician['profile_picture']) ? '../' . htmlspecialchars($technician['profile_picture']) : 'https://ui-avatars.com/api/?name=' . urlencode($technician['name'] ?: 'Technician') . '&background=1a237e&color=fff' ?>" 
+                                     alt="Technician" 
+                                     class="rounded-circle me-2" 
+                                     width="32" 
+                                     height="32"
+                                     style="object-fit: cover; border: 2px solid #4A90E2;">
+                                <span class="me-3">Welcome, <?= htmlspecialchars($technician['name'] ?: 'Technician') ?></span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2" href="profile.php">
+                                        <i class="fas fa-user me-2 text-primary"></i>
+                                        <span>Profile</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-2"></li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2 text-danger" href="../admin/logout.php">
+                                        <i class="fas fa-sign-out-alt me-2"></i>
+                                        <span>Logout</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>

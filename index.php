@@ -259,9 +259,128 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-floating > .password-field-container > .form-control:not(:placeholder-shown) ~ label ~ .password-toggle {
             top: 50%;
         }
+
+        /* Add loading screen styles */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .loading-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .snowflake-loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .snowflake-loader::before,
+        .snowflake-loader::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--light-blue);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .snowflake-loader::before {
+            animation: snowflake-pulse 2s ease-in-out infinite;
+        }
+
+        .snowflake-loader::after {
+            animation: snowflake-pulse 2s ease-in-out infinite 1s;
+        }
+
+        .snowflake-loader i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--primary-blue);
+            font-size: 48px;
+            animation: snowflake-beat 2s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: var(--primary-blue);
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .progress-container {
+            width: 200px;
+            height: 4px;
+            background: var(--light-blue);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-blue);
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+
+        @keyframes snowflake-beat {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes snowflake-pulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
+    <!-- Add loading screen HTML -->
+    <div class="loading-screen">
+        <div class="snowflake-loader">
+            <i class="fas fa-snowflake"></i>
+        </div>
+        <div class="loading-text">Loading Dashboard...</div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -331,6 +450,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const selectedRoleInput = document.getElementById('selectedRole');
             const passwordInput = document.getElementById('password');
             const toggleButton = document.querySelector('.password-toggle');
+            const loadingScreen = document.querySelector('.loading-screen');
+            const loginForm = document.querySelector('form');
+            const progressBar = document.querySelector('.progress-bar');
 
             // Role selection functionality
             roleCards.forEach(card => {
@@ -347,11 +469,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
 
             toggleButton.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent form submission
+                e.preventDefault();
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 this.querySelector('i').classList.toggle('fa-eye');
                 this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+
+            // Add form submit handler for loading screen
+            loginForm.addEventListener('submit', function(e) {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const role = selectedRoleInput.value;
+
+                if (username && password && role) {
+                    e.preventDefault();
+                    loadingScreen.classList.add('active');
+                    
+                    // Reset progress bar
+                    progressBar.style.width = '0%';
+                    
+                    // Animate progress bar over 5 seconds
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 1;
+                        progressBar.style.width = progress + '%';
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            this.submit();
+                        }
+                    }, 50); // 50ms * 100 = 5000ms (5 seconds)
+                }
             });
         });
     </script>
