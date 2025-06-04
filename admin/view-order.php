@@ -274,17 +274,17 @@ try {
                                 <div class="d-grid gap-2">
                                     <?php if ($_SESSION['role'] === 'admin'): ?>
                                         <?php if ($order['status'] !== 'completed'): ?>
-                                        <a href="edit-order.php?id=<?= $order['id'] ?>" class="btn btn-warning">
+                                        <a href="controller/edit-order.php?id=<?= $order['id'] ?>" class="btn btn-warning">
                                             <i class="fas fa-edit me-2"></i>Edit Order
                                         </a>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <?php if ($order['status'] === 'pending'): ?>
-                                        <a href="update-status.php?id=<?= $order['id'] ?>&status=in_progress" class="btn btn-warning">
+                                        <a href="controller/update-status.php?id=<?= $order['id'] ?>&status=in_progress" class="btn btn-warning">
                                             <i class="fas fa-play me-2"></i>Start Work
                                         </a>
                                         <?php elseif ($order['status'] === 'in_progress'): ?>
-                                        <a href="update-status.php?id=<?= $order['id'] ?>&status=completed" class="btn btn-success">
+                                        <a href="controller/update-status.php?id=<?= $order['id'] ?>&status=completed" class="btn btn-success">
                                             <i class="fas fa-check me-2"></i>Mark as Completed
                                         </a>
                                         <?php endif; ?>

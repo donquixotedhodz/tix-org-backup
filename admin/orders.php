@@ -303,16 +303,31 @@ try {
                                                    title="View Details">
                                                     <i class="fas fa-eye text-primary"></i>
                                                 </a>
-                                                <a href="edit-order.php?id=<?= $order['id'] ?>" 
-                                                   class="btn btn-sm btn-light" 
-                                                   data-bs-toggle="tooltip" 
-                                                   title="Edit Order">
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-light edit-order-btn" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editOrderModal"
+                                                        data-id="<?= $order['id'] ?>"
+                                                        data-customer-name="<?= htmlspecialchars($order['customer_name']) ?>"
+                                                        data-customer-phone="<?= htmlspecialchars($order['customer_phone']) ?>"
+                                                        data-customer-address="<?= htmlspecialchars($order['customer_address']) ?>"
+                                                        data-service-type="<?= htmlspecialchars($order['service_type']) ?>"
+                                                        data-aircon-model="<?= $order['aircon_model_id'] ?>"
+                                                        data-technician="<?= $order['assigned_technician_id'] ?>"
+                                                        data-due-date="<?= date('Y-m-d', strtotime($order['due_date'])) ?>"
+                                                        data-price="<?= $order['price'] ?>"
+                                                        data-status="<?= htmlspecialchars($order['status']) ?>"
+                                                        title="Edit Order">
                                                     <i class="fas fa-edit text-warning"></i>
-                                                </a>
+                                                </button>
                                                 <?php if ($order['status'] !== 'completed'): ?>
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-light" 
-                                                        data-bs-toggle="tooltip" 
+                                                        class="btn btn-sm btn-light complete-order-btn" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#completeOrderModal"
+                                                        data-id="<?= $order['id'] ?>"
+                                                        data-order-number="<?= htmlspecialchars($order['job_order_number']) ?>"
+                                                        data-customer-name="<?= htmlspecialchars($order['customer_name']) ?>"
                                                         title="Mark as Completed">
                                                     <i class="fas fa-check text-success"></i>
                                                 </button>
@@ -338,7 +353,7 @@ try {
                     <h5 class="modal-title">Add New Job Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process_order.php" method="POST">
+                <form action="controller/process_order.php" method="POST">
                     <div class="modal-body">
                         <div class="row g-3">
                             <!-- Customer Information -->
@@ -405,6 +420,117 @@ try {
         </div>
     </div>
 
+    <!-- Edit Order Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Job Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="controller/process_edit.php" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="order_id" id="edit_order_id">
+                        <div class="row g-3">
+                            <!-- Customer Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" name="customer_name" id="edit_customer_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="customer_phone" id="edit_customer_phone" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="customer_address" id="edit_customer_address" rows="2" required></textarea>
+                            </div>
+
+                            <!-- Service Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Service Type</label>
+                                <select class="form-select" name="service_type" id="edit_service_type" required>
+                                    <option value="installation">Installation</option>
+                                    <option value="repair">Repair</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Aircon Model</label>
+                                <select class="form-select" name="aircon_model_id" id="edit_aircon_model">
+                                    <option value="">Select Model</option>
+                                    <?php foreach ($airconModels as $model): ?>
+                                    <option value="<?= $model['id'] ?>"><?= htmlspecialchars($model['brand'] . ' - ' . $model['model_name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <!-- Assignment Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Assign Technician</label>
+                                <select class="form-select" name="assigned_technician_id" id="edit_technician">
+                                    <option value="">Select Technician</option>
+                                    <?php foreach ($technicians as $tech): ?>
+                                    <option value="<?= $tech['id'] ?>"><?= htmlspecialchars($tech['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" class="form-control" name="due_date" id="edit_due_date" required>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="col-md-6">
+                                <label class="form-label">Price (₱)</label>
+                                <input type="number" class="form-control" name="price" id="edit_price" step="0.01" required>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" id="edit_status" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Order Modal -->
+    <div class="modal fade" id="completeOrderModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Complete Job Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="controller/complete_order.php" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="order_id" id="complete_order_id">
+                        <p>Are you sure you want to mark this job order as completed?</p>
+                        <div class="alert alert-info">
+                            <strong>Order #:</strong> <span id="complete_order_number"></span><br>
+                            <strong>Customer:</strong> <span id="complete_customer_name"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Mark as Completed</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
@@ -415,6 +541,56 @@ try {
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
+
+        // Handle edit order modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('editOrderModal');
+            
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                
+                // Get data from button
+                const orderId = button.getAttribute('data-id');
+                const customerName = button.getAttribute('data-customer-name');
+                const customerPhone = button.getAttribute('data-customer-phone');
+                const customerAddress = button.getAttribute('data-customer-address');
+                const serviceType = button.getAttribute('data-service-type');
+                const airconModel = button.getAttribute('data-aircon-model');
+                const technician = button.getAttribute('data-technician');
+                const dueDate = button.getAttribute('data-due-date');
+                const price = button.getAttribute('data-price');
+                const status = button.getAttribute('data-status');
+
+                // Set form values
+                editModal.querySelector('#edit_order_id').value = orderId;
+                editModal.querySelector('#edit_customer_name').value = customerName;
+                editModal.querySelector('#edit_customer_phone').value = customerPhone;
+                editModal.querySelector('#edit_customer_address').value = customerAddress;
+                editModal.querySelector('#edit_service_type').value = serviceType;
+                editModal.querySelector('#edit_aircon_model').value = airconModel;
+                editModal.querySelector('#edit_technician').value = technician;
+                editModal.querySelector('#edit_due_date').value = dueDate;
+                editModal.querySelector('#edit_price').value = price;
+                editModal.querySelector('#edit_status').value = status;
+            });
+
+            // Handle complete order modal
+            const completeModal = document.getElementById('completeOrderModal');
+            
+            completeModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                
+                // Get data from button
+                const orderId = button.getAttribute('data-id');
+                const orderNumber = button.getAttribute('data-order-number');
+                const customerName = button.getAttribute('data-customer-name');
+
+                // Set form values
+                completeModal.querySelector('#complete_order_id').value = orderId;
+                completeModal.querySelector('#complete_order_number').textContent = orderNumber;
+                completeModal.querySelector('#complete_customer_name').textContent = customerName;
+            });
+        });
     </script>
 </body>
 </html> 

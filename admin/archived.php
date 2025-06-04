@@ -23,7 +23,11 @@ try {
         SELECT 
             jo.*,
             COALESCE(am.model_name, 'Not Specified') as model_name,
-            t.name as technician_name
+            t.name as technician_name,
+            CASE 
+                WHEN jo.status = 'completed' THEN COALESCE(jo.completed_at, jo.updated_at)
+                ELSE COALESCE(jo.updated_at, jo.created_at)
+            END as status_date
         FROM job_orders jo 
         LEFT JOIN aircon_models am ON jo.aircon_model_id = am.id 
         LEFT JOIN technicians t ON jo.assigned_technician_id = t.id
@@ -48,13 +52,15 @@ try {
     }
 
     if (!empty($start_date)) {
-        $sql .= " AND jo.completed_at >= ?";
-        $params[] = $start_date . ' 00:00:00'; // Include start of the day
+        $sql .= " AND (jo.completed_at >= ? OR jo.updated_at >= ?)";
+        $params[] = $start_date . ' 00:00:00';
+        $params[] = $start_date . ' 00:00:00';
     }
 
     if (!empty($end_date)) {
-        $sql .= " AND jo.completed_at <= ?";
-        $params[] = $end_date . ' 23:59:59'; // Include end of the day
+        $sql .= " AND (jo.completed_at <= ? OR jo.updated_at <= ?)";
+        $params[] = $end_date . ' 23:59:59';
+        $params[] = $end_date . ' 23:59:59';
     }
 
     $sql .= "
@@ -63,7 +69,7 @@ try {
                 WHEN jo.status = 'completed' THEN 1
                 WHEN jo.status = 'cancelled' THEN 2
             END,
-            jo.completed_at DESC
+            status_date DESC
     ";
 
     $stmt = $pdo->prepare($sql);
@@ -287,7 +293,15 @@ try {
                                             </span>
                                         </td>
                                         <td>
-                                            <div class="fw-medium"><?= date('M d, Y', strtotime($order['completed_at'])) ?></div>
+                                            <div class="fw-medium">
+                                                <?php 
+                                                if (!empty($order['status_date'])) {
+                                                    echo date('M d, Y', strtotime($order['status_date']));
+                                                } else {
+                                                    echo 'N/A';
+                                                }
+                                                ?>
+                                            </div>
                                         </td>
                                         <td>
                                             <div class="fw-semibold">₱<?= number_format($order['price'], 2) ?></div>

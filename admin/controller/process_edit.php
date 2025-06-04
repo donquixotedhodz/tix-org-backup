@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 // Check if form was submitted
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: orders.php');
+    header('Location: ../orders.php');
     exit();
 }
 
@@ -19,7 +19,7 @@ $required_fields = ['order_id', 'customer_name', 'customer_phone', 'customer_add
 foreach ($required_fields as $field) {
     if (!isset($_POST[$field]) || empty($_POST[$field])) {
         $_SESSION['error'] = "All required fields must be filled out.";
-        header('Location: edit-order.php?id=' . $_POST['order_id']);
+        header('Location: ../edit-order.php?id=' . $_POST['order_id']);
         exit();
     }
 }
@@ -33,7 +33,7 @@ try {
     $stmt->execute([$_POST['order_id']]);
     if (!$stmt->fetch()) {
         $_SESSION['error'] = "Order not found.";
-        header('Location: orders.php');
+        header('Location: ../orders.php');
         exit();
     }
 
@@ -68,11 +68,11 @@ try {
     ]);
 
     $_SESSION['success'] = "Order has been updated successfully.";
-    header('Location: orders.php');
+    header('Location: ../orders.php');
     exit();
 
 } catch (PDOException $e) {
     $_SESSION['error'] = "Database error: " . $e->getMessage();
-    header('Location: edit-order.php?id=' . $_POST['order_id']);
+    header('Location: ../edit-order.php?id=' . $_POST['order_id']);
     exit();
 } 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -10,13 +10,13 @@ if (!isset($_SESSION['user_id'])) {
 
 // Check if order ID and status are provided
 if (!isset($_GET['id']) || !isset($_GET['status'])) {
-    header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+    header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
     exit();
 }
 
 $allowed_statuses = ['in_progress', 'completed'];
 if (!in_array($_GET['status'], $allowed_statuses)) {
-    header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+    header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
     exit();
 }
 
@@ -41,20 +41,20 @@ try {
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$order) {
-        header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+        header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
         exit();
     }
 
     // Validate status transition
     if ($_GET['status'] === 'completed' && $order['status'] !== 'in_progress') {
         $_SESSION['error'] = "Cannot mark order as completed. It must be in progress first.";
-        header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+        header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
         exit();
     }
 
     if ($_GET['status'] === 'in_progress' && $order['status'] !== 'pending') {
         $_SESSION['error'] = "Cannot start work. Order must be pending first.";
-        header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+        header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
         exit();
     }
 
@@ -69,11 +69,11 @@ try {
     $stmt->execute([$_GET['status'], $_GET['id']]);
 
     $_SESSION['success'] = "Order status has been updated successfully.";
-    header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+    header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
     exit();
 
 } catch (PDOException $e) {
     $_SESSION['error'] = "Database error: " . $e->getMessage();
-    header('Location: ' . ($_SESSION['role'] === 'admin' ? 'orders.php' : 'technician/orders.php'));
+    header('Location: ' . ($_SESSION['role'] === 'admin' ? '../orders.php' : '../technician/orders.php'));
     exit();
 } 

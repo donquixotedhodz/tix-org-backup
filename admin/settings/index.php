@@ -204,7 +204,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 </div>
                 <div class="modal-body">
                     <!-- Change Password Form -->
-                    <form action="../controller/change_password.php" method="POST">
+                    <form action="controller/change_password.php" method="POST">
                         <div class="mb-3">
                             <label for="currentPassword" class="form-label">Current Password</label>
                             <input type="password" class="form-control" id="currentPassword" name="current_password" required>
@@ -234,7 +234,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 </div>
                 <div class="modal-body">
                     <!-- Create Admin Form -->
-                    <form action="../controller/create_admin.php" method="POST">
+                    <form action="controller/create_admin.php" method="POST">
                         <div class="mb-3">
                             <label for="adminUsername" class="form-label">Username</label>
                             <input type="text" class="form-control" id="adminUsername" name="username" required>

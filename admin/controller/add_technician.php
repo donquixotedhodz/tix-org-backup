@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -68,22 +68,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Redirect back to technicians page with success message
             $_SESSION['success_message'] = "Technician added successfully!";
-            header('Location: technicians.php');
+            header('Location: ../technicians.php');
             exit();
         } else {
             // Redirect back with errors
             $_SESSION['error_message'] = implode("<br>", $errors);
-            header('Location: technicians.php');
+            header('Location: ../technicians.php');
             exit();
         }
 
     } catch (PDOException $e) {
         $_SESSION['error_message'] = "Database error: " . $e->getMessage();
-        header('Location: technicians.php');
+        header('Location: ../technicians.php');
         exit();
     }
 } else {
     // If not POST request, redirect to technicians page
-    header('Location: technicians.php');
+    header('Location: ../technicians.php');
     exit();
 } 

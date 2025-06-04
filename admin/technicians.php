@@ -193,19 +193,27 @@ try {
                 </div>
 
                 <!-- Alert Messages -->
-                <?php if (isset($_SESSION['success_message'])): ?>
+                <?php 
+                if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])): 
+                    $success_message = $_SESSION['success_message'];
+                    unset($_SESSION['success_message']);
+                ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?= htmlspecialchars($_SESSION['success_message']) ?>
+                    <?= htmlspecialchars($success_message) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <?php unset($_SESSION['success_message']); endif; ?>
+                <?php endif; ?>
 
-                <?php if (isset($_SESSION['error_message'])): ?>
+                <?php 
+                if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])): 
+                    $error_message = $_SESSION['error_message'];
+                    unset($_SESSION['error_message']);
+                ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= htmlspecialchars($_SESSION['error_message']) ?>
+                    <?= htmlspecialchars($error_message) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <?php unset($_SESSION['error_message']); endif; ?>
+                <?php endif; ?>
 
                 <!-- Technicians Table -->
                 <div class="card">
@@ -334,7 +342,7 @@ try {
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addTechnicianForm" action="add_technician.php" method="POST">
+                    <form id="addTechnicianForm" action="controller/add_technician.php" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
                             <input type="text" class="form-control" name="name" required>

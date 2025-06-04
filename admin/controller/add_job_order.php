@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 // Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Redirect back to dashboard with success message
                 $_SESSION['success_message'] = "Job order added successfully!";
-                header('Location: dashboard.php');
+                header('Location: ../dashboard.php');
                 exit();
             } catch (Exception $e) {
                 // Rollback transaction on error
@@ -121,17 +121,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Redirect back with errors
             $_SESSION['error_message'] = implode("<br>", $errors);
-            header('Location: dashboard.php');
+            header('Location: ../dashboard.php');
             exit();
         }
 
     } catch (PDOException $e) {
         $_SESSION['error_message'] = "Database error: " . $e->getMessage();
-        header('Location: dashboard.php');
+        header('Location: ../dashboard.php');
         exit();
     }
 } else {
     // If not POST request, redirect to dashboard
-    header('Location: dashboard.php');
+    header('Location: ../dashboard.php');
     exit();
 } 
