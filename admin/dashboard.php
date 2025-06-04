@@ -190,7 +190,7 @@ try {
                             </a>
                         </li>
                         <li>
-                            <a href="php/archived.php">
+                            <a href="archived.php">
                                 <i class="fas fa-archive"></i>
                                 Archived
                             </a>
@@ -198,7 +198,7 @@ try {
                     </ul>
                 </li>
                 <li>
-                    <a href="technician/technicians.php">
+                    <a href="technicians.php">
                         <i class="fas fa-users-cog"></i>
                         Technicians
                     </a>
@@ -216,7 +216,7 @@ try {
                     </a>
                     <ul class="collapse list-unstyled" id="settingsSubmenu">
                         <li>
-                            <a href="../php/settings.php">
+                            <a href="settings/index.php">
                                 <i class="fas fa-user-shield"></i>
                                 Admin Settings
                             </a>

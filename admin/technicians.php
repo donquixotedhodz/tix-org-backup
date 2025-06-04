@@ -136,7 +136,7 @@ try {
                     </a>
                     <ul class="collapse list-unstyled" id="settingsSubmenu">
                         <li>
-                            <a href="settings.php">
+                            <a href="settings/index.php">
                                 <i class="fas fa-user-shield"></i>
                                 Admin Settings
                             </a>
@@ -195,14 +195,14 @@ try {
                 <!-- Alert Messages -->
                 <?php if (isset($_SESSION['success_message'])): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?= $_SESSION['success_message'] ?>
+                    <?= htmlspecialchars($_SESSION['success_message']) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 <?php unset($_SESSION['success_message']); endif; ?>
 
                 <?php if (isset($_SESSION['error_message'])): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= $_SESSION['error_message'] ?>
+                    <?= htmlspecialchars($_SESSION['error_message']) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 <?php unset($_SESSION['error_message']); endif; ?>
@@ -293,14 +293,22 @@ try {
                                                     <i class="fas fa-clipboard-list text-primary"></i>
                                                 </a>
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-light" 
-                                                        data-bs-toggle="tooltip" 
+                                                        class="btn btn-sm btn-light edit-technician-btn" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editTechnicianModal"
+                                                        data-id="<?= $tech['id'] ?>"
+                                                        data-name="<?= htmlspecialchars($tech['name']) ?>"
+                                                        data-username="<?= htmlspecialchars($tech['username']) ?>"
+                                                        data-phone="<?= htmlspecialchars($tech['phone']) ?>"
                                                         title="Edit Technician">
                                                     <i class="fas fa-edit text-warning"></i>
                                                 </button>
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-light" 
-                                                        data-bs-toggle="tooltip" 
+                                                        class="btn btn-sm btn-light delete-technician-btn" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteTechnicianModal"
+                                                        data-id="<?= $tech['id'] ?>"
+                                                        data-name="<?= htmlspecialchars($tech['name']) ?>"
                                                         title="Delete Technician">
                                                     <i class="fas fa-trash text-danger"></i>
                                                 </button>
@@ -357,6 +365,64 @@ try {
         </div>
     </div>
 
+    <!-- Edit Technician Modal -->
+    <div class="modal fade" id="editTechnicianModal" tabindex="-1" aria-labelledby="editTechnicianModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTechnicianModalLabel">Edit Technician</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTechnicianForm" action="controller/edit_technician.php" method="POST">
+                        <input type="hidden" name="technician_id" id="edit_technician_id">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="name" id="edit_technician_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" id="edit_technician_username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" id="edit_technician_phone" required>
+                        </div>
+                        <!-- Password fields are typically handled separately for security -->
+                        <!-- Or you can add them here if needed, but require current password -->
+                        <div class="modal-footer px-0 pb-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Technician Modal -->
+    <div class="modal fade" id="deleteTechnicianModal" tabindex="-1" aria-labelledby="deleteTechnicianModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTechnicianModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete technician <strong id="delete_technician_name_placeholder"></strong>?</p>
+                    <p class="text-danger"><small>This action cannot be undone.</small></p>
+                    <form id="deleteTechnicianForm" action="controller/delete_technician.php" method="POST">
+                        <input type="hidden" name="technician_id" id="delete_technician_id">
+                        <div class="modal-footer px-0 pb-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
@@ -367,6 +433,35 @@ try {
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('editTechnicianModal');
+            const deleteModal = document.getElementById('deleteTechnicianModal');
+
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const technicianId = button.getAttribute('data-id');
+                const technicianName = button.getAttribute('data-name');
+                const technicianUsername = button.getAttribute('data-username');
+                const technicianPhone = button.getAttribute('data-phone');
+
+                // Populate the modal's form fields
+                editModal.querySelector('#edit_technician_id').value = technicianId;
+                editModal.querySelector('#edit_technician_name').value = technicianName;
+                editModal.querySelector('#edit_technician_username').value = technicianUsername;
+                editModal.querySelector('#edit_technician_phone').value = technicianPhone;
+            });
+
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const technicianId = button.getAttribute('data-id');
+                const technicianName = button.getAttribute('data-name');
+
+                // Populate the modal content
+                deleteModal.querySelector('#delete_technician_id').value = technicianId;
+                deleteModal.querySelector('#delete_technician_name_placeholder').textContent = technicianName;
+            });
+        });
     </script>
 </body>
 </html> 

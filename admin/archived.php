@@ -8,12 +8,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+// Get filter parameters from the request
+$search_customer = $_GET['search_customer'] ?? '';
+$filter_service = $_GET['filter_service'] ?? '';
+$filter_technician = $_GET['filter_technician'] ?? '';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
 try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Get completed and cancelled job orders
-    $stmt = $pdo->query("
+    $sql = "
         SELECT 
             jo.*,
             COALESCE(am.model_name, 'Not Specified') as model_name,
@@ -22,14 +29,51 @@ try {
         LEFT JOIN aircon_models am ON jo.aircon_model_id = am.id 
         LEFT JOIN technicians t ON jo.assigned_technician_id = t.id
         WHERE jo.status IN ('completed', 'cancelled')
+    ";
+
+    $params = [];
+
+    if (!empty($search_customer)) {
+        $sql .= " AND jo.customer_name LIKE ?";
+        $params[] = '%' . $search_customer . '%';
+    }
+
+    if (!empty($filter_service)) {
+        $sql .= " AND jo.service_type = ?";
+        $params[] = $filter_service;
+    }
+
+    if (!empty($filter_technician)) {
+        $sql .= " AND jo.assigned_technician_id = ?";
+        $params[] = $filter_technician;
+    }
+
+    if (!empty($start_date)) {
+        $sql .= " AND jo.completed_at >= ?";
+        $params[] = $start_date . ' 00:00:00'; // Include start of the day
+    }
+
+    if (!empty($end_date)) {
+        $sql .= " AND jo.completed_at <= ?";
+        $params[] = $end_date . ' 23:59:59'; // Include end of the day
+    }
+
+    $sql .= "
         ORDER BY 
             CASE 
                 WHEN jo.status = 'completed' THEN 1
                 WHEN jo.status = 'cancelled' THEN 2
             END,
             jo.completed_at DESC
-    ");
+    ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get technicians for dropdown
+    $stmt = $pdo->query("SELECT id, name FROM technicians");
+    $technicians = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
@@ -107,7 +151,7 @@ try {
                     </a>
                     <ul class="collapse list-unstyled" id="settingsSubmenu">
                         <li>
-                            <a href="settings.php">
+                            <a href="settings/index.php">
                                 <i class="fas fa-user-shield"></i>
                                 Admin Settings
                             </a>
@@ -159,6 +203,44 @@ try {
                         </button>
                     </div>
                 </div>
+
+                <!-- Search and Filter Form -->
+                <form method="GET" action="" class="mb-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="search_customer" class="form-label">Search Customer</label>
+                            <input type="text" class="form-control" id="search_customer" name="search_customer" value="<?= htmlspecialchars($search_customer) ?>" placeholder="Enter customer name">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filter_service" class="form-label">Service Type</label>
+                            <select class="form-select" id="filter_service" name="filter_service">
+                                <option value="">All Service Types</option>
+                                <option value="installation" <?= $filter_service === 'installation' ? 'selected' : '' ?>>Installation</option>
+                                <option value="repair" <?= $filter_service === 'repair' ? 'selected' : '' ?>>Repair</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filter_technician" class="form-label">Technician</label>
+                            <select class="form-select" id="filter_technician" name="filter_technician">
+                                <option value="">All Technicians</option>
+                                <?php foreach ($technicians as $tech): ?>
+                                    <option value="<?= $tech['id'] ?>" <?= (string)$filter_technician === (string)$tech['id'] ? 'selected' : '' ?>><?= htmlspecialchars($tech['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                         <div class="col-md-3">
+                            <label for="start_date" class="form-label">Completion Date (From)</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="<?= htmlspecialchars($start_date) ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_date" class="form-label">Completion Date (To)</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="<?= htmlspecialchars($end_date) ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-secondary w-100">Apply Filters</button>
+                        </div>
+                    </div>
+                </form>
 
                 <!-- Orders Table -->
                 <div class="card">
