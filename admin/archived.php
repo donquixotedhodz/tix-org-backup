@@ -12,8 +12,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $search_customer = $_GET['search_customer'] ?? '';
 $filter_service = $_GET['filter_service'] ?? '';
 $filter_technician = $_GET['filter_technician'] ?? '';
-$start_date = $_GET['start_date'] ?? '';
-$end_date = $_GET['end_date'] ?? '';
+
 
 try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
@@ -227,14 +226,6 @@ try {
                                     <option value="<?= $tech['id'] ?>" <?= (string)$filter_technician === (string)$tech['id'] ? 'selected' : '' ?>><?= htmlspecialchars($tech['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
-                         <div class="col-md-3">
-                            <label for="start_date" class="form-label">Completion Date (From)</label>
-                            <input type="date" class="form-control" id="start_date" name="start_date" value="<?= htmlspecialchars($start_date) ?>">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="end_date" class="form-label">Completion Date (To)</label>
-                            <input type="date" class="form-control" id="end_date" name="end_date" value="<?= htmlspecialchars($end_date) ?>">
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-secondary w-100">Apply Filters</button>
